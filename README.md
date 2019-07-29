@@ -1,5 +1,7 @@
 # PirateApplication
-
+[![Quality Score][ico-scrutinizer]][link-scrutinizer]
+[![Build Status][ico-travis]][link-travis]
+![PHP from Travis config](https://img.shields.io/travis/php-v/holidaypirates/pirate-skeleton-application?style=flat-square)
 ## About
 Ahoy pirate ! This is an simple PHP skeleton application (based on Zend Expressive) that is ready to sail in AWS Lightsail !  
 It comes with the features working out of the box to make it easier for you to spin your new webservice:
@@ -53,17 +55,6 @@ You can then browse to http://pirate-app.local/api/v1/ping . You should be able 
 ```bash
 $ composer commander migrations:migrate
 ```
-
-5 - Optional : Import data from the PirateApplication's Google Spreadsheet "database":
-- Set up on your `.env` file the `GOOGLE_SPREADSHEET_CREDENTIALS` env var:
-> Go to https://developers.google.com/sheets/api/quickstart/php, click on "Enable the Google Sheets API", click on "Download Client Configuration" and paste the file's JSON in here).
-- Run the Commander command to import the spreadsheet:
-```bash
-$ composer commander database:import:spreadsheet SPREADSHEET_ID
-```
-> Replace the `SPREADSHEET_ID` with the PirateApplication's Spreadsheet id
-
-By running the steps above you should have the Tags, Translations (MarketOptions) and Triggers imported from the Spreadsheet.
 
 ## Composer scripts:
 - `composer up` : Serves the application (equals to `docker-composer up -d`)
@@ -151,3 +142,8 @@ docker-compose run redis redis-cli -h redis
 
 ## Profiling and Profiling monitor
 Update your `docker-compose.yml` to enable XDebug profiling then go to http://pirate-app.local:8081 and you should be able to view your xdebug profiler logs.
+
+[ico-travis]: https://img.shields.io/travis/holidaypirates/pirate-skeleton-application/master.svg?style=flat-square
+[ico-scrutinizer]: https://scrutinizer-ci.com/g/holidaypirates/pirate-skeleton-application/badges/quality-score.png?b=master
+[link-travis]: https://travis-ci.org/holidaypirates/pirate-skeleton-application
+[link-scrutinizer]: https://scrutinizer-ci.com/g/holidaypirates/pirate-skeleton-application/code-structure
