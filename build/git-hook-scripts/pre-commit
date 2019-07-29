@@ -1,0 +1,12 @@
+#!/bin/sh
+#
+# Git pre-commit hook that runs all checks inside docker
+
+# If you want to allow non-ASCII filenames set this variable to true.
+allownonascii=$(git config --bool hooks.allownonascii)
+
+# Redirect output to stderr.
+exec 1>&2
+
+# If there are whitespace errors, print the offending file names and fail.
+exec composer check

@@ -1,0 +1,38 @@
+version: '3'
+services:
+
+  nginx:
+    image: nginx:latest
+    ports:
+      - 80:80
+    volumes:
+      - .:/code
+      - ./build/local/docker/nginx/site.conf:/etc/nginx/conf.d/site.conf
+      - ./data/logs:/var/log/nginx
+    links:
+      - php
+
+  php:
+    build: build/local/docker/php
+    ports:
+      - 9000:9000
+    volumes:
+      - .:/code
+    environment:
+      # Uncomment the line below to enable the Xdebug profiler.
+      # Please note that you should disable it when you are not profiling because it makes PHPUnit and other CI checks SUPER slow.
+      #XDEBUG_CONFIG: "remote_host=docker.for.mac.host.internal remote_enable=1 profiler_enable=1 profiler_output_dir=/code/profiler"
+      XDEBUG_CONFIG: "remote_host=docker.for.mac.host.internal remote_enable=1"
+    links:
+      - redis
+
+  redis:
+    image: redis:5.0.4-alpine
+
+  webgrind:
+    image: creativeprojects/webgrind
+    ports:
+      - 8081:80
+    volumes:
+      - ./profiler:/tmp/xdebug:ro
+      - .:/code

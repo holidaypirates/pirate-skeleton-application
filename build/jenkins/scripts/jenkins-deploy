@@ -1,0 +1,46 @@
+pipeline {
+  agent any
+
+  stages {
+    stage('Reading docker-compose.yml') {
+        steps {
+            checkout scm
+            echo "Starting"
+        }
+    }
+    stage('Deploying') {
+        steps {
+            echo "Creating .env file"
+            sh "(rm .env || true) && /usr/bin/envtpl -o .env .env.production.tpl"
+
+            echo "Sending environment variables to the Lightsail instance"
+            sh "scp -o StrictHostKeyChecking=no ./.env ${LIGHTSAIL_INSTANCE_SSH}:/home/ubuntu/pirate-app/.env"
+
+            echo "Updating AWS ECR Token"
+            //This command retrieves a token that is valid for a specified registry for 12 hours
+            //https://docs.aws.amazon.com/cli/latest/reference/ecr/get-login.html
+            sh "ssh -o StrictHostKeyChecking=no ${LIGHTSAIL_INSTANCE_SSH} '\$(aws ecr get-login --region eu-central-1 --no-include-email)'"
+
+            echo "Pulling newer images"
+            sh """\
+                ssh -o StrictHostKeyChecking=no ${LIGHTSAIL_INSTANCE_SSH} '\
+                    docker pull ${AWS_ECR_URI}:${APPLICATION_VERSION_TAG}-php && \
+                    docker pull ${AWS_ECR_URI}:${APPLICATION_VERSION_TAG}-nginx
+                '
+            """
+
+            echo "Deploying to Lightsail"
+            sh """ \
+                ssh -o StrictHostKeyChecking=no ${LIGHTSAIL_INSTANCE_SSH} '\
+                    export APPLICATION_VERSION_TAG=${APPLICATION_VERSION_TAG} && \
+                    cd pirate-app && \
+                    docker-compose -f docker-compose-production.yml stop && \
+                    docker run ${AWS_ECR_URI}:${APPLICATION_VERSION_TAG}-php cat /code/docker-compose-production.yml > docker-compose-production.yml && \
+                    docker-compose -f docker-compose-production.yml up -d && \
+                    docker-compose -f docker-compose-production.yml run redis redis-cli -h redis FLUSHALL
+                '
+            """
+        }
+    }
+  }
+}

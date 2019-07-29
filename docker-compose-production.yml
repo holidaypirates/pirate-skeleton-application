@@ -1,0 +1,23 @@
+version: '3'
+services:
+  nginx:
+    image: ${AWS_ECR_URI}:${APPLICATION_VERSION_TAG}-nginx
+    ports:
+      - 80:80
+    links:
+      - php
+
+  php:
+    image: ${AWS_ECR_URI}:${APPLICATION_VERSION_TAG}-php
+    env_file:
+      - .env
+
+  redis:
+    image: redis:5.0.4-alpine
+    links:
+      - php
+    volumes:
+      - redis-volume:/data
+
+volumes:
+  redis-volume:

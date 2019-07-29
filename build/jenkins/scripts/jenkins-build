@@ -1,0 +1,80 @@
+pipeline {
+  agent any
+
+  environment {
+    hubUri="FILL_WITH_YOUR_ECR_URI"
+    hubUrl="FILL_WITH_YOUR_ECR_URL"
+    hubCreds="FILL_WITH_YOUR_ECR_CREDENTIALS_ALIAS"
+  }
+
+  stages {
+    stage('Checkout Sourcecode') {
+        steps {
+            echo "Cleaning folder"
+            sh "docker run --rm --volume \$PWD:/app composer rm -rf ./* || true"
+
+            echo "Checking out source code"
+            checkout scm
+        }
+    }
+    stage('Testing') {
+        steps {
+            echo "Removing any possible remaining vendor folder"
+            sh "docker run --rm --volume \$PWD:/app composer rm -rf ./vendor || true"
+
+            echo "Installing Composer dev dependencies"
+            sh "docker run --rm \
+                    --volume \$PWD:/app \
+                    --volume ${env.COMPOSER_HOME}:/tmp \
+                    --user \$(id -u):\$(id -g) \
+                    composer install --ignore-platform-reqs"
+
+            echo "Running PHPCS"
+            sh 'docker run  -v "$PWD":/usr/src/myapp -w /usr/src/myapp php:7.3-cli php vendor/bin/phpcs'
+
+            echo "Running PHP Static Analysis Tool"
+            sh 'docker run  -v "$PWD":/usr/src/myapp -w /usr/src/myapp php:7.3-cli php vendor/bin/phpstan analyze -l 6 ./src ./config'
+
+            echo "Running PHPUnit"
+            sh 'docker run  -v "$PWD":/usr/src/myapp -w /usr/src/myapp php:7.3-cli php vendor/bin/phpunit --colors=always'
+        }
+    }
+    stage('Preparing to build') {
+        steps {
+            echo "Removing Composer dev dependencies"
+            sh "docker run --rm \
+                    --volume \$PWD:/app \
+                    --volume ${env.COMPOSER_HOME}:/tmp \
+                    --user \$(id -u):\$(id -g) \
+                    composer install --no-dev --ignore-platform-reqs -o -a"
+
+            echo "Cleaning config cache"
+            sh "docker run --rm --volume \$PWD:/app composer rm -rf ./data/cache/* || true"
+            sh "chmod -R 777 data/cache"
+            sh "chmod +x bin/commander.php"
+        }
+    }
+    stage('Build & Push Image') {
+        steps {
+            script {
+                def phpImage = docker.build("${hubUri}", "-f ./build/production/docker/php/Dockerfile .")
+                docker.withRegistry("${hubUrl}", "${hubCreds}") {
+                    phpImage.push("${env.BUILD_NUMBER}-php")
+                }
+
+                def nginxImage = docker.build("${hubUri}", "-f ./build/production/docker/nginx/Dockerfile .")
+                docker.withRegistry("${hubUrl}", "${hubCreds}") {
+                    nginxImage.push("${env.BUILD_NUMBER}-nginx")
+                }
+            }
+        }
+    }
+  }
+
+  post {
+    success {
+        echo "Removing built images"
+        sh("docker rmi ${hubUri}:${env.BUILD_NUMBER}-php ${hubUri}:${env.BUILD_NUMBER}-nginx")
+    }
+  }
+}

@@ -1,0 +1,66 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "PirateApplication Tag API",
+    "description": "This is the documentation for using the PirateApplication Tag API."
+  },
+  "externalDocs": {
+    "description": "Find out more about PirateApplication",
+    "url": "https://pirate-application.holidaypirates.group/docs"
+  },
+  "servers": [
+    {
+      "url": "http://pirate-application.holidaypirates.group/api/v1"
+    }
+  ],
+  "paths": {
+    "/ping": {
+      "get": {
+        "summary": "Pings the API to monitor if it still alive",
+        "tags": [
+          "Ping"
+        ],
+        "responses": {
+          "200": {
+            "description": "A positive response if the application is up and running.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/PingResponse"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "A negative response in case the application is down."
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "PingResponse": {
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Ping"
+            }
+          }
+        }
+      },
+      "Ping": {
+        "properties": {
+          "ping": {
+            "type": "string",
+            "example": "pong"
+          }
+        }
+      }
+    }
+  }
+}
