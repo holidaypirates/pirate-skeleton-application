@@ -20,7 +20,7 @@ In order to start your project there is a checklist of items that you must repla
 - Search for all instances of `PirateApplication` and replace with your application name in camel case.
 - Rename the `src/PirateApplication`, `test/PirateApplicationIntegrationTest` and `test/PirateApplicationUnitTest` to the namespace corresponding to your project.
 
-Now you can follow the `Installation section to setup your`
+Now you can follow the `Installation` section to setup your new Pirate Application :D
 
 ## Installation
 - Install Docker on your computer (https://www.docker.com/get-started)
