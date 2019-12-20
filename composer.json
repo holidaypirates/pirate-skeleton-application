@@ -20,7 +20,7 @@
         "php": "^7.3",
         "ext-json": "*",
         "ext-pdo": "*",
-        "elie29/zend-phpdi-config": "^3.0",
+        "elie29/zend-phpdi-config": "^5.0",
         "guzzlehttp/psr7": "^1.6",
         "mead-steve/mono-snag": "^4",
         "middlewares/access-log": "^1.1",
