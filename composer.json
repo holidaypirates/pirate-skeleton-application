@@ -28,7 +28,7 @@
         "paddlehq/openapi-validator": "^1.0",
         "predis/predis": "^1.1",
         "psr/simple-cache": "^1.0",
-        "symfony/cache": "^4.3.8",
+        "symfony/cache": "^5.2.0",
         "symfony/yaml": "^4.2",
         "tuupola/cors-middleware": "^1.1.1",
         "vlucas/phpdotenv": "^2.5",
