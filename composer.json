@@ -24,7 +24,7 @@
         "guzzlehttp/psr7": "^1.6",
         "mead-steve/mono-snag": "^4",
         "middlewares/access-log": "^1.1",
-        "middlewares/cache": "^1.1",
+        "middlewares/cache": "^2.1",
         "paddlehq/openapi-validator": "^1.0",
         "predis/predis": "^1.1",
         "psr/simple-cache": "^1.0",
