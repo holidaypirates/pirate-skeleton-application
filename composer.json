@@ -23,7 +23,7 @@
         "elie29/zend-phpdi-config": "^3.0",
         "guzzlehttp/psr7": "^1.6",
         "mead-steve/mono-snag": "^4",
-        "middlewares/access-log": "^1.1",
+        "middlewares/access-log": "^2.0",
         "middlewares/cache": "^1.1",
         "paddlehq/openapi-validator": "^1.0",
         "predis/predis": "^1.1",
